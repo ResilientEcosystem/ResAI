@@ -10,29 +10,37 @@ Files are stored with **public access** by default, making them accessible via U
 
 ## Storage Drivers
 
-The project supports two storage backends:
+The project supports three storage backends:
 
-- **Vercel Blob** - Default for all deployments (recommended)
-- **S3** - Planned for AWS/S3-compatible storage
+- **Local filesystem** – Default when running `pnpm dev`. Files are written under `public/<prefix>` and served from your dev server. Great for quick experimentation.
+- **Vercel Blob** – Recommended for production and the default when `NODE_ENV=production`.
+- **S3** – Planned support for AWS/S3-compatible storage.
 
-**Vercel Blob** is the default storage driver and works seamlessly in both local development and production environments.
+> ⚠️ The local filesystem driver is for development only. Runtime files disappear on redeploy and are not accessible to remote AI providers. Switch to Vercel Blob (or another remote backend) before deploying.
 
 ## Configuration
 
 ### Environment Variables
 
 ```ini
-# Storage driver selection (defaults to vercel-blob)
-FILE_STORAGE_TYPE=vercel-blob # or s3 (coming soon)
+# Storage driver selection (defaults to: local in dev, vercel-blob otherwise)
+# Options: local | vercel-blob | s3
+FILE_STORAGE_TYPE=
 
 # Optional: Subdirectory prefix for organizing files
 FILE_STORAGE_PREFIX=uploads
+
+# === Local filesystem (FILE_STORAGE_TYPE=local) ===
+# Where files should be written (defaults to <project>/public)
+LOCAL_FILE_STORAGE_DIR=public
+# Optional public base URL override (defaults to /<prefix>/...)
+LOCAL_FILE_STORAGE_BASE_URL=
 
 # === Vercel Blob (FILE_STORAGE_TYPE=vercel-blob) ===
 BLOB_READ_WRITE_TOKEN=<auto on Vercel>
 VERCEL_BLOB_CALLBACK_URL= # Optional: For local webhook testing with ngrok
 
-# === S3 (FILE_STORAGE_TYPE=s3, not yet implemented) ===
+# === S3 (FILE_STORAGE_TYPE=s3) ===
 # FILE_STORAGE_S3_BUCKET=
 # FILE_STORAGE_S3_REGION=
 # AWS_ACCESS_KEY_ID=
@@ -159,7 +167,12 @@ onUploadCompleted: async ({ blob, tokenPayload }) => {
 
 ## Advanced
 
-### Local Development with Vercel Blob Webhooks
+### Local Development Notes
+
+- By default, local dev uses the filesystem driver, so uploads land in `public/<prefix>`. Delete them manually when you no longer need them.
+- To test cloud storage locally, set `FILE_STORAGE_TYPE=vercel-blob` and ensure `BLOB_READ_WRITE_TOKEN` is available (e.g., via `vercel env pull`).
+
+#### Vercel Blob Webhooks
 
 To test Vercel Blob's `onUploadCompleted` webhook locally, use [ngrok](https://ngrok.com/):
 
@@ -193,21 +206,21 @@ The `FileStorage` interface provides:
 
 ### Storage Comparison
 
-| Feature              | Vercel Blob         | S3 (Planned)       |
-| -------------------- | ------------------- | ------------------ |
-| Direct Client Upload | ✅ Yes              | ✅ Yes (presigned) |
-| CDN                  | ✅ Global           | Configurable       |
-| Cost                 | Pay-as-you-go       | Pay-as-you-go      |
-| Best For             | All deployments     | AWS ecosystem      |
-| Setup Complexity     | Minimal             | Moderate           |
-| Local Development    | ✅ Works with token | ✅ Works           |
+| Feature              | Local (Dev Only)        | Vercel Blob         | S3 (Planned)       |
+| -------------------- | ----------------------- | ------------------- | ------------------ |
+| Direct Client Upload | ❌ Server proxy only    | ✅ Yes              | ✅ Yes (presigned) |
+| CDN                  | ❌ None                 | ✅ Global           | Configurable       |
+| Cost                 | Free (your disk)        | Pay-as-you-go       | Pay-as-you-go      |
+| Best For             | Personal experiments    | All deployments     | AWS ecosystem      |
+| Setup Complexity     | None                    | Minimal             | Moderate           |
+| Local Development    | ✅ Default experience   | ✅ Works with token | ✅ Works           |
 
-## Why Not Local Filesystem?
+## Local Filesystem Limitations
 
-Local filesystem storage is **not supported** because:
+The local driver exists strictly for convenience. Keep these trade-offs in mind:
 
-1. **AI APIs can't access localhost**: When AI APIs receive `http://localhost:3000/file.png`, they cannot fetch the file
-2. **Serverless incompatibility**: Platforms like Vercel don't support persistent filesystem
-3. **No CDN**: Files aren't globally distributed
+1. **No remote access** – Public URLs such as `http://localhost:3000/uploads/...` are only reachable from your machine. Remote AI providers cannot fetch them.
+2. **Ephemeral storage** – Files vanish on redeploys or when running in serverless environments.
+3. **No CDN** – You miss out on caching, edge delivery, and bandwidth optimizations.
 
-**Solution**: Vercel Blob provides a free tier and works seamlessly in both local development and production. Simply run `vercel env pull` to get your token locally.
+For any shared or production environment, switch to Vercel Blob or another remotely accessible backend.

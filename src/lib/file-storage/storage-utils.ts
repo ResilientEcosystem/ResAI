@@ -73,11 +73,23 @@ export const resolveStoragePrefix = () => {
   return raw.replace(/^\/+|\/+$|\.+/g, "").trim();
 };
 
+const stripLeadingSlash = (value: string) => value.replace(/^\//, "");
+
+const removeQueryAndHash = (value: string) => value.split(/[?#]/)[0];
+
+const decodePath = (value: string) =>
+  decodeURIComponent(stripLeadingSlash(removeQueryAndHash(value)));
+
 export const storageKeyFromUrl = (input: string): string | null => {
+  if (!input) return null;
+
   try {
     const url = new URL(input);
-    return decodeURIComponent(url.pathname.replace(/^\//, ""));
+    return decodePath(url.pathname);
   } catch {
+    if (input.startsWith("/")) {
+      return decodePath(input);
+    }
     return null;
   }
 };

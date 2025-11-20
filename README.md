@@ -316,11 +316,14 @@ EXA_API_KEY=your_exa_api_key_here
 FILE_BASED_MCP_CONFIG=false
 
 # === File Storage ===
-# Vercel Blob is the default storage driver (works in both local dev and production)
-# Pull the token locally with `vercel env pull`
-FILE_STORAGE_TYPE=vercel-blob
+# Default: local filesystem in dev, Vercel Blob in production
+# Options: vercel-blob | s3 | local
+FILE_STORAGE_TYPE=
 FILE_STORAGE_PREFIX=uploads
 BLOB_READ_WRITE_TOKEN=
+# Optional overrides for local filesystem driver
+LOCAL_FILE_STORAGE_DIR=public
+LOCAL_FILE_STORAGE_BASE_URL=
 
 # -- S3 (coming soon) --
 # FILE_STORAGE_TYPE=s3

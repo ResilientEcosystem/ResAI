@@ -77,6 +77,8 @@ const staticModels = {
     "deepseek-r1:free": openrouter("deepseek/deepseek-r1-0528:free"),
     "deepseek-v3:free": openrouter("deepseek/deepseek-chat-v3-0324:free"),
     "gemini-2.0-flash-exp:free": openrouter("google/gemini-2.0-flash-exp:free"),
+    "gemini-3": openrouter("google/gemini-3-pro-preview"),
+    "gpt-5": openrouter("openai/gpt-5"),
   },
 };
 
@@ -149,6 +151,10 @@ registerFileSupport(staticModels.xai["grok-3"], XAI_FILE_MIME_TYPES);
 registerFileSupport(staticModels.xai["grok-3-mini"], XAI_FILE_MIME_TYPES);
 registerFileSupport(
   staticModels.openRouter["gemini-2.0-flash-exp:free"],
+  GEMINI_FILE_MIME_TYPES,
+);
+registerFileSupport(
+  staticModels.openRouter["gemini-3"],
   GEMINI_FILE_MIME_TYPES,
 );
 

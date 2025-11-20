@@ -38,4 +38,11 @@ describe("checkStorageAction", () => {
     const res = await checkStorageAction();
     expect(res.isValid).toBe(true);
   });
+
+  it("local storage is always valid", async () => {
+    process.env.FILE_STORAGE_TYPE = "local";
+    const { checkStorageAction } = await importActions();
+    const res = await checkStorageAction();
+    expect(res.isValid).toBe(true);
+  });
 });

@@ -19,9 +19,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "better-chatbot",
+  title: "ResAI",
   description:
-    "Better Chatbot is a chatbot that uses the Tools to answer questions.",
+    "ResAI is a chatbot that uses the Tools to answer questions related to ResilientDB",
 };
 
 export default async function RootLayout({

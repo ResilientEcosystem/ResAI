@@ -43,6 +43,8 @@ export async function checkStorageAction(): Promise<StorageCheckResult> {
             : "5. Run 'vercel env pull' to get the token locally"),
       };
     }
+
+    return { isValid: true };
   }
 
   // 2. Check S3 configuration
@@ -74,15 +76,20 @@ export async function checkStorageAction(): Promise<StorageCheckResult> {
     return { isValid: true };
   }
 
+  if (storageDriver === "local") {
+    return { isValid: true };
+  }
+
   // 3. Validate storage driver
-  if (!["vercel-blob", "s3"].includes(storageDriver)) {
+  if (!["vercel-blob", "s3", "local"].includes(storageDriver)) {
     return {
       isValid: false,
       error: `Invalid storage driver: ${storageDriver}`,
       solution:
         "FILE_STORAGE_TYPE must be one of:\n" +
         "- 'vercel-blob' (default)\n" +
-        "- 's3' (coming soon)",
+        "- 's3'\n" +
+        "- 'local' (development)",
     };
   }
 
