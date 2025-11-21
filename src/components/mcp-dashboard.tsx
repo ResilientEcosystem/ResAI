@@ -25,6 +25,7 @@ import {
 } from "ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { BasicUser } from "app-types/user";
+import { MCP_DASHBOARD_CONFIG } from "lib/const";
 
 const LightRays = dynamic(() => import("@/components/ui/light-rays"), {
   ssr: false,
@@ -178,7 +179,7 @@ export default function MCPDashboard({ message, user }: MCPDashboardProps) {
                 </DropdownMenu>
               ) : null}
 
-              {canCreate && (
+              {MCP_DASHBOARD_CONFIG.showMarketplace && canCreate && (
                 <Link
                   href="https://smithery.ai/"
                   target="_blank"

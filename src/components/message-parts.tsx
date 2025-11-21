@@ -706,6 +706,17 @@ const WebSearchToolInvocation = dynamic(
   },
 );
 
+const WebPreviewToolInvocation = dynamic(
+  () =>
+    import("./tool-invocation/web-preview").then(
+      (mod) => mod.WebPreviewToolInvocation,
+    ),
+  {
+    ssr: false,
+    loading,
+  },
+);
+
 const CodeExecutor = dynamic(
   () =>
     import("./tool-invocation/code-executor").then((mod) => mod.CodeExecutor),
@@ -874,6 +885,10 @@ export const ToolMessagePart = memo(
         toolName === DefaultToolName.WebContent
       ) {
         return <WebSearchToolInvocation part={part} />;
+      }
+
+      if (toolName === DefaultToolName.WebPreview) {
+        return <WebPreviewToolInvocation part={part} />;
       }
 
       if (toolName === ImageToolName) {

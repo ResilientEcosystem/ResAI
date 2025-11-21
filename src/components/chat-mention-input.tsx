@@ -374,6 +374,10 @@ export function ChatMentionInputSuggestion({
           label = "web-content";
           description = "Get the content of a web page";
           break;
+        case DefaultToolName.WebPreview:
+          label = "web-preview";
+          description = "Preview a website or HTML content";
+          break;
         case DefaultToolName.Http:
           label = "HTTP";
           description = "Send an http request";

@@ -29,7 +29,13 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { appStore } from "@/app/store";
-import { BASE_THEMES, COOKIE_KEY_LOCALE, SUPPORTED_LOCALES } from "lib/const";
+import {
+  BASE_THEMES,
+  COOKIE_KEY_LOCALE,
+  SUPPORTED_LOCALES,
+  GITHUB_ISSUES_URL,
+  DISCORD_INVITE_URL,
+} from "lib/const";
 import { capitalizeFirstLetter, cn, fetcher } from "lib/utils";
 import { authClient } from "auth/client";
 import { useTranslations } from "next-intl";
@@ -139,10 +145,7 @@ export function AppSidebarUserInner(props: {
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => {
-                window.open(
-                  "https://github.com/cgoinglove/better-chatbot/issues/new",
-                  "_blank",
-                );
+                window.open(GITHUB_ISSUES_URL, "_blank");
               }}
             >
               <GithubIcon className="size-4 fill-foreground" />
@@ -150,7 +153,7 @@ export function AppSidebarUserInner(props: {
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => {
-                window.open("https://discord.gg/gCRu69Upnp", "_blank");
+                window.open(DISCORD_INVITE_URL, "_blank");
               }}
             >
               <DiscordIcon className="size-4 fill-foreground" />
@@ -218,7 +221,7 @@ function SelectTheme() {
               <div
                 className={cn(
                   theme === "dark" &&
-                    "bg-accent ring ring-muted-foreground/40 text-foreground",
+                  "bg-accent ring ring-muted-foreground/40 text-foreground",
                   "p-1 rounded-full",
                 )}
               >
@@ -227,7 +230,7 @@ function SelectTheme() {
               <div
                 className={cn(
                   theme === "light" &&
-                    "bg-accent ring ring-muted-foreground/40 text-foreground",
+                  "bg-accent ring ring-muted-foreground/40 text-foreground",
                   "p-1 rounded-full",
                 )}
               >

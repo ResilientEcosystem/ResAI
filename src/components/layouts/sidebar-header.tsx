@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "ui/sidebar";
-import { PanelLeft } from "lucide-react";
+import { Brain, PanelLeft } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { isShortcutEvent, Shortcuts } from "lib/keyboard-shortcuts";
 
@@ -68,7 +68,8 @@ export function SidebarHeaderShared({
       <SidebarMenu>
         <SidebarMenuItem className="flex items-center gap-0.5 mb-1">
           <SidebarMenuButton asChild className="hover:bg-transparent">
-            <Link href={href} onClick={handleLinkClick}>
+            <Link href={href} onClick={handleLinkClick} className="flex items-center gap-2">
+              <Brain className="size-4 text-primary" />
               <h4 className="font-bold">{title}</h4>
               {showMobileToggle && (
                 <div

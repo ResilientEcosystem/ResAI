@@ -12,6 +12,7 @@ export enum DefaultToolName {
   CreateTable = "createTable",
   WebSearch = "webSearch",
   WebContent = "webContent",
+  WebPreview = "webPreview",
   Http = "http",
   JavascriptExecution = "mini-javascript-execution",
   PythonExecution = "python-execution",

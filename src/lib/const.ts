@@ -51,6 +51,7 @@ export const BASE_THEMES = [
   "vintage-vinyl",
   "misty-harbor",
   "zen-garden",
+  "claude"
 ];
 
 export const OAUTH_REQUIRED_CODE = "OAUTH_REQUIRED";
@@ -64,7 +65,6 @@ export const SUPPORTED_LOCALES = [
     code: "ko",
     name: "Korean 🇰🇷",
   },
-
   {
     code: "es",
     name: "Spanish 🇪🇸",
@@ -102,3 +102,21 @@ export const EMOJI_DATA = [
   "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f601.png",
   "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f600.png",
 ];
+
+export const GITHUB_ISSUES_URL =
+  "https://github.com/ResilientEcosystem/ResAI/issues/new";
+
+export const DISCORD_INVITE_URL = "https://discord.gg/X2WSMM8V2P";
+
+export const SIDEBAR_CONFIG = {
+  showNewChat: true,
+  showMCP: true,
+  showWorkflow: false,
+  showArchive: true,
+  showAdmin: true,
+  showAgents: false,
+} as const;
+
+export const MCP_DASHBOARD_CONFIG = {
+  showMarketplace: false,
+}
