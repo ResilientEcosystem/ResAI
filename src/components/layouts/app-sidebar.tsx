@@ -12,7 +12,6 @@ import { isShortcutEvent, Shortcuts } from "lib/keyboard-shortcuts";
 import { AppSidebarUser } from "./app-sidebar-user";
 import { BasicUser } from "app-types/user";
 import { SIDEBAR_CONFIG } from "lib/const";
-import { Think } from "ui/think";
 
 export function AppSidebar({
   user,

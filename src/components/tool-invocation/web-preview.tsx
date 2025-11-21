@@ -17,7 +17,6 @@ import {
     ArrowLeft,
     ArrowRight,
     RefreshCw,
-    Maximize2,
     ExternalLink,
 } from "lucide-react";
 import {
@@ -33,6 +32,8 @@ function PureWebPreviewToolInvocation({
     part,
 }: WebPreviewToolInvocationProps) {
     const [expanded, setExpanded] = useState(false);
+    const regularContainerRef = useRef<HTMLDivElement>(null);
+    const expandedContainerRef = useRef<HTMLDivElement>(null);
 
     const result = useMemo(() => {
         if (!part.state.startsWith("output")) return null;
@@ -98,6 +99,14 @@ function PureWebPreviewToolInvocation({
         return null;
     }, [result]);
 
+    const originalUrl = useMemo(() => {
+        if (!result) return null;
+        if (typeof result === "string") return result;
+        if (result.url) return result.url;
+        if (result.html) return previewUrl; // blob URL for HTML
+        return null;
+    }, [result, previewUrl]);
+
     if (!part.state.startsWith("output")) {
         return (
             <div className="flex items-center gap-2 text-sm">
@@ -128,14 +137,6 @@ function PureWebPreviewToolInvocation({
             </Alert>
         );
     }
-
-    const originalUrl = useMemo(() => {
-        if (!result) return null;
-        if (typeof result === "string") return result;
-        if (result.url) return result.url;
-        if (result.html) return previewUrl; // blob URL for HTML
-        return null;
-    }, [result, previewUrl]);
 
     const handleOpenInNewTab = () => {
         if (originalUrl) {
@@ -224,9 +225,6 @@ function PureWebPreviewToolInvocation({
             </div>
         );
     };
-
-    const regularContainerRef = useRef<HTMLDivElement>(null);
-    const expandedContainerRef = useRef<HTMLDivElement>(null);
 
     return (
         <div className="flex flex-col gap-2 w-full max-w-full">
