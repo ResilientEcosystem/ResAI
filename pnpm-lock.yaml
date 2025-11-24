@@ -44,6 +44,9 @@ importers:
       '@openrouter/ai-sdk-provider':
         specifier: ^1.2.0
         version: 1.2.0(ai@5.0.82(zod@4.1.12))(zod@4.1.12)
+      '@paper-design/shaders-react':
+        specifier: ^0.0.65
+        version: 0.0.65(@types/react@19.2.2)(react@19.2.0)
       '@radix-ui/react-accordion':
         specifier: ^1.2.12
         version: 1.2.12(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -1537,6 +1540,18 @@ packages:
   '@opentelemetry/api@1.9.0':
     resolution: {integrity: sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==}
     engines: {node: '>=8.0.0'}
+
+  '@paper-design/shaders-react@0.0.65':
+    resolution: {integrity: sha512-938W1mHANC2uArAglhG2a60qzajlWnqKPsw5E9HUnu1vJ2d5Kne0771fR8dRL1wS0VwwFyPbOdr7mmSrdmwe8g==}
+    peerDependencies:
+      '@types/react': ^18 || ^19
+      react: ^18 || ^19
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
+  '@paper-design/shaders@0.0.65':
+    resolution: {integrity: sha512-BjOfV82yFn1jxoc6HlirHnTaafXIb7SVItGP1lK9hxmqA2f0bt6otoH/lCp9N9aLTxBivB6AwMfeZYvwOsAjTw==}
 
   '@peculiar/asn1-android@2.5.0':
     resolution: {integrity: sha512-t8A83hgghWQkcneRsgGs2ebAlRe54ns88p7ouv8PW2tzF1nAW4yHcL4uZKrFpIU+uszIRzTkcCuie37gpkId0A==}
@@ -7726,6 +7741,15 @@ snapshots:
       zod: 4.1.12
 
   '@opentelemetry/api@1.9.0': {}
+
+  '@paper-design/shaders-react@0.0.65(@types/react@19.2.2)(react@19.2.0)':
+    dependencies:
+      '@paper-design/shaders': 0.0.65
+      react: 19.2.0
+    optionalDependencies:
+      '@types/react': 19.2.2
+
+  '@paper-design/shaders@0.0.65': {}
 
   '@peculiar/asn1-android@2.5.0':
     dependencies:

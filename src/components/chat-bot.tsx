@@ -49,6 +49,7 @@ import { getStorageManager } from "lib/browser-stroage";
 import { AnimatePresence, motion } from "framer-motion";
 import { useThreadFileUploader } from "@/hooks/use-thread-file-uploader";
 import { useFileDragOverlay } from "@/hooks/use-file-drag-overlay";
+import { ANIMATION_CONFIG } from "lib/const";
 
 type Props = {
   threadId: string;
@@ -323,7 +324,7 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
 
   const handleFocus = useCallback(() => {
     setShowParticles(false);
-    debounce(() => setShowParticles(true), 60000);
+    debounce(() => setShowParticles(true), ANIMATION_CONFIG.chatAnimationDelay);
   }, []);
 
   const handleScroll = useCallback(() => {
@@ -346,6 +347,7 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
 
   useEffect(() => {
     appStoreMutate({ currentThreadId: threadId });
+    setShowParticles(true);
     return () => {
       appStoreMutate({ currentThreadId: null });
     };
@@ -450,9 +452,9 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
                     sendMessage={sendMessage}
                     className={
                       isLastMessage &&
-                      message.role != "user" &&
-                      !space &&
-                      message.parts.length > 1
+                        message.role != "user" &&
+                        !space &&
+                        message.parts.length > 1
                         ? "min-h-[calc(55dvh-40px)]"
                         : ""
                     }

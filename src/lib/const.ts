@@ -51,7 +51,8 @@ export const BASE_THEMES = [
   "vintage-vinyl",
   "misty-harbor",
   "zen-garden",
-  "claude"
+  "claude",
+  "resai",
 ];
 
 export const OAUTH_REQUIRED_CODE = "OAUTH_REQUIRED";
@@ -119,4 +120,8 @@ export const SIDEBAR_CONFIG = {
 
 export const MCP_DASHBOARD_CONFIG = {
   showMarketplace: false,
+}
+
+export const ANIMATION_CONFIG = {
+  chatAnimationDelay: 5000, //5 Seconds
 }
