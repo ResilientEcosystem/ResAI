@@ -123,5 +123,5 @@ export const MCP_DASHBOARD_CONFIG = {
 }
 
 export const ANIMATION_CONFIG = {
-  chatAnimationDelay: 5000, //5 Seconds
+  chatAnimationDelay: 30000, // 30 seconds of inactivity
 }

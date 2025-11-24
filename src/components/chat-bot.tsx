@@ -4,7 +4,6 @@ import { useChat } from "@ai-sdk/react";
 import { toast } from "sonner";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import PromptInput from "./prompt-input";
-import clsx from "clsx";
 import { appStore } from "@/app/store";
 import { cn, createDebounce, generateUUID, truncateString } from "lib/utils";
 import { ErrorMessage, PreviewMessage } from "./message";
@@ -57,13 +56,12 @@ type Props = {
   selectedChatModel?: string;
 };
 
-const LightRays = dynamic(() => import("ui/light-rays"), {
-  ssr: false,
-});
-
-const Particles = dynamic(() => import("ui/particles"), {
-  ssr: false,
-});
+const ShaderBackground = dynamic(
+  () => import("ui/shader-background"),
+  {
+    ssr: false,
+  },
+);
 
 const debounce = createDebounce();
 
@@ -290,7 +288,7 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
     return false;
   }, [isLoading, messages.at(-1)]);
 
-  const particle = useMemo(() => {
+  const shaderBackground = useMemo(() => {
     return (
       <AnimatePresence>
         {showParticles && (
@@ -299,23 +297,20 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 5 }}
+            className="absolute inset-0 w-full h-full z-10 pointer-events-none overflow-hidden"
           >
-            <div className="absolute top-0 left-0 w-full h-full z-10">
-              <LightRays />
-            </div>
-            <div className="absolute top-0 left-0 w-full h-full z-10">
-              <Particles particleCount={400} particleBaseSize={10} />
-            </div>
-
-            <div className="absolute top-0 left-0 w-full h-full z-10">
-              <div className="w-full h-full bg-gradient-to-t from-background to-50% to-transparent z-20" />
-            </div>
-            <div className="absolute top-0 left-0 w-full h-full z-10">
-              <div className="w-full h-full bg-gradient-to-l from-background to-20% to-transparent z-20" />
-            </div>
-            <div className="absolute top-0 left-0 w-full h-full z-10">
-              <div className="w-full h-full bg-gradient-to-r from-background to-20% to-transparent z-20" />
-            </div>
+            <ShaderBackground>
+              {/* Gradient overlays for better text readability */}
+              <div className="absolute top-0 left-0 w-full h-full z-20">
+                <div className="w-full h-full bg-gradient-to-t from-background to-50% to-transparent" />
+              </div>
+              <div className="absolute top-0 left-0 w-full h-full z-20">
+                <div className="w-full h-full bg-gradient-to-l from-background to-20% to-transparent" />
+              </div>
+              <div className="absolute top-0 left-0 w-full h-full z-20">
+                <div className="w-full h-full bg-gradient-to-r from-background to-20% to-transparent" />
+              </div>
+            </ShaderBackground>
           </motion.div>
         )}
       </AnimatePresence>
@@ -323,7 +318,16 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
   }, [showParticles]);
 
   const handleFocus = useCallback(() => {
+    // Hide shader when input is focused
     setShowParticles(false);
+    // Show again after 60 seconds of inactivity
+    debounce(() => setShowParticles(true), ANIMATION_CONFIG.chatAnimationDelay);
+  }, []);
+
+  const handleInputChange = useCallback(() => {
+    // Hide shader while user is typing/working
+    setShowParticles(false);
+    // Show again after 60 seconds of inactivity
     debounce(() => setShowParticles(true), ANIMATION_CONFIG.chatAnimationDelay);
   }, []);
 
@@ -347,7 +351,8 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
 
   useEffect(() => {
     appStoreMutate({ currentThreadId: threadId });
-    setShowParticles(true);
+    // Show shader after timeout instead of immediately
+    debounce(() => setShowParticles(true), ANIMATION_CONFIG.chatAnimationDelay);
     return () => {
       appStoreMutate({ currentThreadId: null });
     };
@@ -400,20 +405,20 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
   }, []);
 
   useEffect(() => {
-    if (mounted) {
-      handleFocus();
+    if (mounted && input) {
+      handleInputChange();
     }
-  }, [input]);
+  }, [input, handleInputChange, mounted]);
 
   return (
-    <>
-      {particle}
-      <div
-        className={cn(
-          emptyMessage && "justify-center pb-24",
-          "flex flex-col min-w-0 relative h-full z-40",
-        )}
-      >
+    <div
+      className={cn(
+        emptyMessage && "justify-center pb-24",
+        "flex flex-col min-w-0 relative h-full z-40",
+      )}
+    >
+      {shaderBackground}
+      <div className="relative z-30 flex flex-col min-w-0 h-full">
         {isDragging && (
           <div className="absolute inset-0 z-40 bg-background/70 backdrop-blur-sm flex items-center justify-center pointer-events-none">
             <div className="rounded-2xl px-6 py-5 bg-background/80 shadow-xl border border-border flex items-center gap-3">
@@ -427,11 +432,24 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
           </div>
         )}
         {emptyMessage ? (
-          <ChatGreeting />
+          <div className="flex-1 flex flex-col items-center justify-center gap-8">
+            <ChatGreeting />
+            <div className="max-w-3xl w-full px-6">
+              <PromptInput
+                input={input}
+                threadId={threadId}
+                sendMessage={sendMessage}
+                setInput={setInput}
+                isLoading={isLoading || isPendingToolCall}
+                onStop={stop}
+                onFocus={handleFocus}
+              />
+            </div>
+          </div>
         ) : (
           <>
             <div
-              className={"flex flex-col gap-2 overflow-y-auto py-6 z-10"}
+              className={"flex flex-col gap-2 overflow-y-auto py-6 pb-32 z-10"}
               ref={containerRef}
               onScroll={handleScroll}
             >
@@ -478,36 +496,35 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
           </>
         )}
 
-        <div
-          className={clsx(
-            messages.length && "absolute bottom-14",
-            "w-full z-10",
-          )}
-        >
-          <div className="max-w-3xl mx-auto relative flex justify-center items-center -top-2">
-            <ScrollToBottomButton
-              show={!isAtBottom && messages.length > 0}
-              onClick={scrollToBottom}
-            />
-          </div>
+        {messages.length > 0 && (
+          <div className="absolute bottom-0 left-0 right-0 w-full z-10 pb-6 flex flex-col items-center">
+            <div className="max-w-3xl w-full relative flex justify-center items-center mb-2">
+              <ScrollToBottomButton
+                show={!isAtBottom && messages.length > 0}
+                onClick={scrollToBottom}
+              />
+            </div>
 
-          <PromptInput
-            input={input}
-            threadId={threadId}
-            sendMessage={sendMessage}
-            setInput={setInput}
-            isLoading={isLoading || isPendingToolCall}
-            onStop={stop}
-            onFocus={isFirstTime ? undefined : handleFocus}
-          />
-        </div>
+            <div className="max-w-3xl w-full">
+              <PromptInput
+                input={input}
+                threadId={threadId}
+                sendMessage={sendMessage}
+                setInput={setInput}
+                isLoading={isLoading || isPendingToolCall}
+                onStop={stop}
+                onFocus={handleFocus}
+              />
+            </div>
+          </div>
+        )}
         <DeleteThreadPopup
           threadId={threadId}
           onClose={() => setIsDeleteThreadPopupOpen(false)}
           open={isDeleteThreadPopupOpen}
         />
       </div>
-    </>
+    </div>
   );
 }
 
