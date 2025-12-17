@@ -7,6 +7,7 @@ const BUILD_OUTPUT = process.env.NEXT_STANDALONE_OUTPUT
 
 export default () => {
   const nextConfig: NextConfig = {
+    productionBrowserSourceMaps: false,
     output: BUILD_OUTPUT,
     cleanDistDir: true,
     devIndicators: {
@@ -18,33 +19,15 @@ export default () => {
     experimental: {
       taint: true,
       authInterrupts: true,
+      webpackMemoryOptimizations: true,
+      turbo: {
+        // Disable source maps in Turbopack to prevent memory leaks
+        sourceMaps: false,
+      },
     },
-    webpack: (config, { dev, isServer }) => {
-      if (dev && !isServer) {
-        config.optimization = {
-          ...config.optimization,
-          moduleIds: "deterministic",
-          runtimeChunk: "single",
-          splitChunks: {
-            chunks: "all",
-            cacheGroups: {
-              default: false,
-              vendors: false,
-              shiki: {
-                name: "shiki",
-                test: /[\\/]node_modules[\\/]shiki[\\/]/,
-                priority: 10,
-                reuseExistingChunk: true,
-              },
-            },
-          },
-        };
-        config.cache = {
-          type: "filesystem",
-          buildDependencies: {
-            config: [__filename],
-          },
-        };
+    webpack: (config, { dev }) => {
+      if (dev) {
+        config.devtool = false; // Disable source maps in dev
       }
       return config;
     },
