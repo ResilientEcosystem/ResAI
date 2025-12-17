@@ -1,11 +1,8 @@
 "use client";
 
 import type { JSX } from "react";
-import {
-  bundledLanguages,
-  codeToHast,
-  type BundledLanguage,
-} from "shiki/bundle/web";
+import { codeToHast } from "lib/shiki/highlighter";
+import type { BundledLanguage } from "shiki";
 import { Fragment, useLayoutEffect, useState } from "react";
 import { jsx, jsxs } from "react/jsx-runtime";
 import { toJsxRuntime } from "hast-util-to-jsx-runtime";
@@ -17,6 +14,7 @@ import { CheckIcon, CopyIcon } from "lucide-react";
 import JsonView from "ui/json-view";
 import { useCopy } from "@/hooks/use-copy";
 import dynamic from "next/dynamic";
+import { getBundledLanguages } from "lib/shiki/highlighter";
 
 // Dynamically import MermaidDiagram component
 const MermaidDiagram = dynamic(
@@ -81,8 +79,10 @@ export async function Highlight(
   lang: BundledLanguage | (string & {}),
   theme: string,
 ) {
+  const bundledLanguages = getBundledLanguages();
+  const langSet = new Set(bundledLanguages);
   const parsed: BundledLanguage = (
-    bundledLanguages[lang] ? lang : "md"
+    langSet.has(lang as BundledLanguage) ? lang : "md"
   ) as BundledLanguage;
 
   if (lang === "json") {

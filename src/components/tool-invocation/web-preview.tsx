@@ -23,6 +23,7 @@ import {
     Dialog,
     DialogContent,
 } from "ui/dialog";
+import { McpUIRenderer } from "ui/mcp-ui-renderer";
 
 interface WebPreviewToolInvocationProps {
     part: ToolUIPart;
@@ -144,6 +145,16 @@ function PureWebPreviewToolInvocation({
         }
     };
 
+    // Determine if we should use MCP UI based on URL
+    // For now, use MCP UI for all URLs, but you can add specific conditions
+    const useMcpUI = useMemo(() => {
+        if (!previewUrl) return false;
+        // Use MCP UI for all URLs (you can add specific conditions here)
+        // For example, only use MCP UI for specific domains:
+        // return previewUrl.includes('dev-res-view.vercel.app');
+        return true;
+    }, [previewUrl]);
+
     const PreviewContent = ({
         className,
         containerRef,
@@ -153,6 +164,16 @@ function PureWebPreviewToolInvocation({
         containerRef?: React.RefObject<HTMLDivElement | null>;
         showExpandButton?: boolean;
     }) => {
+        // Use MCP UI renderer instead of iframe
+        if (useMcpUI && previewUrl) {
+            return (
+                <div ref={containerRef} className={className}>
+                    <McpUIRenderer url={previewUrl} className="w-full h-full" />
+                </div>
+            );
+        }
+
+        // Fallback to original iframe implementation
         const getIframe = () => {
             if (containerRef?.current) {
                 return containerRef.current.querySelector(
