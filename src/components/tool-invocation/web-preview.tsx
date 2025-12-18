@@ -108,6 +108,16 @@ function PureWebPreviewToolInvocation({
         return null;
     }, [result, previewUrl]);
 
+    // Determine if we should use MCP UI based on URL
+    // For now, use MCP UI for all URLs, but you can add specific conditions
+    const useMcpUI = useMemo(() => {
+        if (!previewUrl) return false;
+        // Use MCP UI for all URLs (you can add specific conditions here)
+        // For example, only use MCP UI for specific domains:
+        // return previewUrl.includes('dev-res-view.vercel.app');
+        return true;
+    }, [previewUrl]);
+
     if (!part.state.startsWith("output")) {
         return (
             <div className="flex items-center gap-2 text-sm">
@@ -144,16 +154,6 @@ function PureWebPreviewToolInvocation({
             window.open(originalUrl, "_blank", "noopener,noreferrer");
         }
     };
-
-    // Determine if we should use MCP UI based on URL
-    // For now, use MCP UI for all URLs, but you can add specific conditions
-    const useMcpUI = useMemo(() => {
-        if (!previewUrl) return false;
-        // Use MCP UI for all URLs (you can add specific conditions here)
-        // For example, only use MCP UI for specific domains:
-        // return previewUrl.includes('dev-res-view.vercel.app');
-        return true;
-    }, [previewUrl]);
 
     const PreviewContent = ({
         className,
