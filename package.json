@@ -7,10 +7,11 @@
   "type": "module",
   "scripts": {
     "dev": "NODE_OPTIONS='--max-old-space-size=4096' NEXT_DISABLE_SOURCE_MAPS=1 next dev",
+    "dev:inspect": "NODE_OPTIONS='--inspect' NEXT_DISABLE_SOURCE_MAPS=1 next dev",
     "dev:turbopack": "NODE_OPTIONS='--max-old-space-size=4096' NEXT_DISABLE_SOURCE_MAPS=1 next dev --turbopack",
     "dev:https": "next dev --experimental-https",
     "build": "next build",
-    "start": "next start",
+    "start": "NODE_OPTIONS='--inspect' next start",
     "build:local": "cross-env NO_HTTPS='1' next build",
     "test": "vitest run",
     "test:watch": "vitest",
