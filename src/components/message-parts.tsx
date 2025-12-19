@@ -64,6 +64,7 @@ import { notify } from "lib/notify";
 import { ModelProviderIcon } from "ui/model-provider-icon";
 import { appStore } from "@/app/store";
 import { BACKGROUND_COLORS, EMOJI_DATA } from "lib/const";
+import { UIResourceRenderer } from "@mcp-ui/client";
 
 type MessagePart = UIMessage["parts"][number];
 type TextMessagePart = Extract<MessagePart, { type: "text" }>;
@@ -856,19 +857,19 @@ export const ToolMessagePart = memo(
       if (isCompleted) {
         return Array.isArray(output)
           ? {
-              ...output,
-              content: output.map((node) => {
-                // mcp tools
-                if (node?.type === "text" && typeof node?.text === "string") {
-                  const parsed = safeJSONParse(node.text);
-                  return {
-                    ...node,
-                    text: parsed.success ? parsed.value : node.text,
-                  };
-                }
-                return node;
-              }),
-            }
+            ...output,
+            content: output.map((node) => {
+              // mcp tools
+              if (node?.type === "text" && typeof node?.text === "string") {
+                const parsed = safeJSONParse(node.text);
+                return {
+                  ...node,
+                  text: parsed.success ? parsed.value : node.text,
+                };
+              }
+              return node;
+            }),
+          }
           : output;
       }
       return null;
@@ -878,6 +879,39 @@ export const ToolMessagePart = memo(
       () => VercelAIWorkflowToolStreamingResultTag.isMaybe(result),
       [result],
     );
+
+    // Extract UI resources from result content
+    const uiResources = useMemo(() => {
+      if (!result || typeof result !== "object") return [];
+
+      const content = (result as any)?.content;
+      if (!Array.isArray(content)) return [];
+
+      const resources: any[] = [];
+
+      content.forEach((item: any) => {
+        // Direct resource item
+        if (
+          item?.type === "resource" &&
+          item?.resource?.uri?.startsWith("ui://")
+        ) {
+          resources.push(item);
+        }
+        // Text item that might contain a nested resource object
+        else if (item?.type === "text" && typeof item?.text === "object") {
+          const textContent = item.text;
+          // Check if the text content is actually a resource object
+          if (
+            textContent?.type === "resource" &&
+            textContent?.resource?.uri?.startsWith("ui://")
+          ) {
+            resources.push(textContent);
+          }
+        }
+      });
+
+      return resources;
+    }, [result]);
 
     const CustomToolComponent = useMemo(() => {
       if (
@@ -1062,41 +1096,68 @@ export const ToolMessagePart = memo(
                     result={result as VercelAIWorkflowToolStreamingResult}
                   />
                 ) : (
-                  <div
-                    className={cn(
-                      "min-w-0 w-full p-4 rounded-lg bg-card px-4 border text-xs mt-2 transition-colors fade-300",
-                      !isExpanded && "hover:bg-secondary cursor-pointer",
-                    )}
-                    onClick={() => {
-                      if (!isExpanded) {
-                        setExpanded(true);
-                      }
-                    }}
-                  >
-                    <div className="flex items-center">
-                      <h5 className="text-muted-foreground font-medium select-none">
-                        Response
-                      </h5>
-                      <div className="flex-1" />
-                      {copiedOutput ? (
-                        <Check className="size-3" />
-                      ) : (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-3 text-muted-foreground"
-                          onClick={() => copyOutput(JSON.stringify(result))}
-                        >
-                          <Copy className="size-3" />
-                        </Button>
-                      )}
-                    </div>
-                    {isExpanded && (
-                      <div className="p-2 max-h-[300px] overflow-y-auto">
-                        <JsonView data={result} />
+                  <>
+                    {/* Render UI resources if present */}
+                    {uiResources.length > 0 && (
+                      <div className="min-w-0 w-full mt-2 space-y-4">
+                        {uiResources.map((uiResource: any, index: number) => (
+                          <div
+                            key={uiResource.resource?.uri || index}
+                            className="w-full max-w-[1200px] mx-auto rounded-lg border bg-card overflow-hidden"
+                          >
+                            <div className="h-[700px] w-full">
+                              <UIResourceRenderer
+                                resource={uiResource.resource}
+                                onUIAction={async (action) => {
+                                  console.log("UI Action:", action);
+                                  return { status: "handled" };
+                                }}
+                              />
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     )}
-                  </div>
+                    {/* Render JSON view for other content */}
+                    <div
+                      className={cn(
+                        "min-w-0 w-full p-4 rounded-lg bg-card px-4 border text-xs mt-2 transition-colors fade-300",
+                        !isExpanded && "hover:bg-secondary cursor-pointer",
+                      )}
+                      onClick={() => {
+                        if (!isExpanded) {
+                          setExpanded(true);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center">
+                        <h5 className="text-muted-foreground font-medium select-none">
+                          Response
+                        </h5>
+                        <div className="flex-1" />
+                        {copiedOutput ? (
+                          <Check className="size-3" />
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-3 text-muted-foreground"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              copyOutput(JSON.stringify(result));
+                            }}
+                          >
+                            <Copy className="size-3" />
+                          </Button>
+                        )}
+                      </div>
+                      {isExpanded && (
+                        <div className="p-2 max-h-[300px] overflow-y-auto">
+                          <JsonView data={result} />
+                        </div>
+                      )}
+                    </div>
+                  </>
                 )}
 
                 {isManualToolInvocation && (
@@ -1289,7 +1350,7 @@ export const FileMessagePart = memo(
                 className={cn(
                   "uppercase tracking-wide px-2 py-0.5",
                   isUserMessage &&
-                    "border-accent-foreground/30 text-accent-foreground/90",
+                  "border-accent-foreground/30 text-accent-foreground/90",
                 )}
               >
                 {fileExtension}
@@ -1405,7 +1466,7 @@ export function SourceUrlMessagePart({
               className={cn(
                 "uppercase tracking-wide px-2 py-0.5",
                 isUserMessage &&
-                  "border-accent-foreground/30 text-accent-foreground/90",
+                "border-accent-foreground/30 text-accent-foreground/90",
               )}
             >
               {ext}
