@@ -1,0 +1,25 @@
+FROM python:3.11-slim
+
+RUN apt-get update && apt-get install -y \
+    git \
+    ansible \
+    systemd \
+    curl \
+    net-tools \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+
+WORKDIR /app
+
+# Copy the server script
+COPY resilientdb_mcp.py .
+RUN chmod +x resilientdb_mcp.py
+
+# Create the work directory used by the script
+RUN mkdir -p /root/.resilientdb-mcp
+
+# The command to run the MCP server over stdio
+ENTRYPOINT ["python", "resilientdb_mcp.py"]
