@@ -288,7 +288,7 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
     return false;
   }, [isLoading, messages.at(-1)]);
 
-  const shaderBackground = useMemo(() => {
+  const _shaderBackground = useMemo(() => {
     return (
       <AnimatePresence>
         {showParticles && (
@@ -417,7 +417,7 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
         "flex flex-col min-w-0 relative h-full z-40",
       )}
     >
-      {shaderBackground}
+      {/* {_shaderBackground} */}
       <div className="relative z-30 flex flex-col min-w-0 h-full">
         {isDragging && (
           <div className="absolute inset-0 z-40 bg-background/70 backdrop-blur-sm flex items-center justify-center pointer-events-none">

@@ -112,10 +112,10 @@ export const DISCORD_INVITE_URL = "https://discord.gg/X2WSMM8V2P";
 export const SIDEBAR_CONFIG = {
   showNewChat: true,
   showMCP: true,
-  showWorkflow: false,
+  showWorkflow: true,
   showArchive: true,
   showAdmin: true,
-  showAgents: false,
+  showAgents: true,
 } as const;
 
 export const MCP_DASHBOARD_CONFIG = {
